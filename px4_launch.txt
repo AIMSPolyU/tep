@@ -1,0 +1,10 @@
+ros2 launch mavros px4.launch fcu_url:=/dev/ttyACM0:57600 gcs_url:=udp://@10.1.1.20:14550
+
+
+ros2 launch mavros px4.launch fcu_url:=/dev/ttyACM0:921600 gcs_url:=udp://@10.1.1.20:14550
+
+
+
+ros2 launch mavros px4.launch \
+  fcu_url:=/dev/serial/by-id/usb-MicoAir_MicoAir743AIO_0-if00:57600 \
+  gcs_url:=udp://@10.1.1.20:14550

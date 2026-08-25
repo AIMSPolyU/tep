@@ -1,0 +1,6 @@
+mocap_vision_bridge:
+  ros__parameters:
+    input_topic: /vrpn_mocap/xy1/pose
+    output_topic: /mavros/vision_pose/pose
+    output_frame_id: map
+    timeout_s: 0.2

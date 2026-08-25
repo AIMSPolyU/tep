@@ -1,2 +1,2 @@
 # tep
-2026 IEEE TEP Summer School
+2026 TEP summer school

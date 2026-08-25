@@ -56,13 +56,15 @@ class OffboardVizOnly(Node):
 
         # Waypoints [x, y, z, yaw_deg]
         # IMPORTANT
+        
         self.waypoints = [
             [0.0, 0.0, 2.0, 0.0],
             [2.0, 0.0, 2.0, 45.0],
             [2.0, 2.0, 2.0, 135.0],
             [0.0, 2.0, 2.0, -135.0],
-            [-1.0, 0.0, 2.0, 0.0],
+            [0.0, 0.5, 2.0, 0.0],
         ]
+        
         # Gate visualization parameters
         self.gate_diameter = 1.0
         self.gate_pre_distance = 0.8

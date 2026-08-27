@@ -37,8 +37,8 @@ class OffboardPolylineFollower(Node):
         self.map_frame = "map"
 
         # Pose source (mocap/vision)
-        # self.pose_topic = "/mavros/vision_pose/pose"
-        self.pose_topic = "/mavros/local_position/pose"
+        self.pose_topic = "/mavros/vision_pose/pose"
+        # self.pose_topic = "/mavros/local_position/pose"
         self.pose_timeout_s = 0.2
 
         # Waypoints [x, y, z, yaw_deg]
@@ -58,7 +58,7 @@ class OffboardPolylineFollower(Node):
         self.gate_axis_length = 0.8
 
         # Path-following parameters
-        self.lookahead_distance = 0.25
+        self.lookahead_distance = 0.5
         self.max_track_error = 1.5
         self.recover_track_error = 0.8
         self.takeoff_accept_radius = 0.3

@@ -93,7 +93,7 @@ class OffboardVizOnly(Node):
         # Competition scoring
         self.error_full_score_m = 0.0
         self.error_zero_score_m = 0.50
-        self.time_full_score_s = 10.0
+        self.time_full_score_s = 5.0
         self.time_zero_score_s = 60.0
         self.accuracy_weight = 0.50
         self.time_weight = 0.50

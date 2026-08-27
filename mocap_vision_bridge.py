@@ -5,14 +5,20 @@ import math
 import rclpy
 from geometry_msgs.msg import PoseStamped
 from rclpy.node import Node
-from rclpy.qos import qos_profile_sensor_data
+from rclpy.qos import (
+    DurabilityPolicy,
+    HistoryPolicy,
+    QoSProfile,
+    ReliabilityPolicy,
+    qos_profile_sensor_data,
+)
 
 
 class MocapVisionBridge(Node):
     def __init__(self):
         super().__init__("mocap_vision_bridge")
 
-        self.declare_parameter("input_topic", "/vrpn_mocap/xy1/pose")
+        self.declare_parameter("input_topic", "/vrpn_mocap/tep05/pose")
         self.declare_parameter("output_topic", "/mavros/vision_pose/pose")
         self.declare_parameter("output_frame_id", "map")
         self.declare_parameter("timeout_s", 0.2)
@@ -22,19 +28,35 @@ class MocapVisionBridge(Node):
         self.output_frame_id = self.get_parameter("output_frame_id").value
         self.timeout_s = float(self.get_parameter("timeout_s").value)
 
+        # MAVROS vision_pose requests RELIABLE QoS. The outgoing publisher
+        # must offer RELIABLE, while the VRPN sensor input remains BEST_EFFORT.
+        mavros_qos = QoSProfile(
+            history=HistoryPolicy.KEEP_LAST,
+            depth=10,
+            reliability=ReliabilityPolicy.RELIABLE,
+            durability=DurabilityPolicy.VOLATILE,
+        )
+
         self.publisher = self.create_publisher(
-            PoseStamped, self.output_topic, qos_profile_sensor_data
+            PoseStamped,
+            self.output_topic,
+            mavros_qos,
         )
         self.subscription = self.create_subscription(
-            PoseStamped, self.input_topic, self.pose_callback, qos_profile_sensor_data
+            PoseStamped,
+            self.input_topic,
+            self.pose_callback,
+            qos_profile_sensor_data,
         )
+
         self.last_pose_time = None
         self.stream_timed_out = False
         self.received_count = 0
         self.create_timer(0.1, self.check_timeout)
 
         self.get_logger().info(
-            f"Relaying {self.input_topic} -> {self.output_topic}"
+            f"Relaying {self.input_topic} -> {self.output_topic} "
+            "with RELIABLE output QoS"
         )
 
     def pose_callback(self, msg: PoseStamped):
@@ -66,17 +88,22 @@ class MocapVisionBridge(Node):
         self.stream_timed_out = False
         self.received_count += 1
         if self.received_count == 1:
-            self.get_logger().info("Received and forwarded the first valid mocap pose")
+            self.get_logger().info(
+                "Received and forwarded the first valid mocap pose"
+            )
 
     def check_timeout(self):
         if self.last_pose_time is None:
             return
 
-        elapsed = (self.get_clock().now() - self.last_pose_time).nanoseconds / 1e9
+        elapsed = (
+            self.get_clock().now() - self.last_pose_time
+        ).nanoseconds / 1e9
         if elapsed > self.timeout_s and not self.stream_timed_out:
             self.stream_timed_out = True
             self.get_logger().error(
-                f"Mocap stream timed out after {elapsed:.3f} s; no stale pose is published"
+                f"Mocap stream timed out after {elapsed:.3f} s; "
+                "no stale pose is published"
             )
 
 
